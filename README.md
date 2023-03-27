@@ -9,7 +9,7 @@
 2. [Отправка собранного контейнера](.github/workflows/docker-image.yml)
    в [DockerHub](https://hub.docker.com)
 3. Логин [в WireGuard](.github/workflows/docker-image.yml)
-4. Отправка запроса на развертывание нового
+4. [Отправка запроса](https://github.com/gaskeo/cd-handler) на развертывание нового
    образа [на специальную ручку на сервере](.github/workflows/cd.yml#L34) по
    виртуальной сети
 5. Развертывание нового образа на сервере
