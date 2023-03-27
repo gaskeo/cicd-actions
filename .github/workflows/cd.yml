@@ -13,6 +13,23 @@ jobs:
       -
         name: get repo
         uses: actions/checkout@v3
+      - name: set up wireguard
+        run: |
+          sudo apt install wireguard -y
+          sudo apt install resolvconf -y
+          cat << EOF > wg0.conf
+          [Interface]
+          PrivateKey = ${{ secrets.WG_PRIVATE_KEY }}
+          Address = ${{ secrets.WG_ADDERSS }}
+          DNS = 8.8.8.8
+          [Peer]
+          PublicKey = ${{ secrets.WG_PUBLIC_KEY }}
+          Endpoint = ${{ secrets.WG_ENDPOINT }} 
+          AllowedIPs = ${{ secrets.WG_ALLOWED_IPS }}
+          PersistentKeepalive = 20
+          EOF
+          sudo cp wg0.conf /etc/wireguard/
+          wg-quick up wg0
       -
         name: trigger recreate
         run: |
