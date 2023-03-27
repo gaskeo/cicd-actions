@@ -27,27 +27,33 @@
 | `WG_ENDPOINT`          | Адрес и порт WireGuard сервера                                         |   `11.23.31.43:51141`    |
 | `WG_ALLOWED_IPS`       | Подмаска адресов, с которыми клиент связан через сервер WireGuard      |      `10.0.0.0/24`       |
 | `CD_HOST`              | Адрес CD-сервера внутри виртуальной сети WireGuard                     | `http://10.0.0.13:8080`  |
-| `CD_SECRET`            | Токен, необходимый для прохождения аутентификации на CD-сервере        |   `fsadjsadfgsafas`      | 
+| `CD_SECRET`            | Токен, необходимый для прохождения аутентификации на CD-сервере        |    `fsadjsadfgsafas`     | 
 
-## CI 
-Весь CI запускается в одном [github action](https://github.com/gaskeo/cicd-actions/blob/main/.github/workflows/docker-image.yml), 
+## CI
+
+Весь CI запускается в
+одном [github action](https://github.com/gaskeo/cicd-actions/blob/main/.github/workflows/docker-image.yml),
 он состоит из 4 этапов.
 
 ### Этап 1. Копирование кода
 
-[Исходный код копируется](.github/workflows/docker-image.yml#L12) в экшен посредством `actions/checkout@v3`.
+[Исходный код копируется](.github/workflows/docker-image.yml#L12) в экшен
+посредством `actions/checkout@v3`.
 
 ### Этап 2. Вход в DockerHub
 
-[Авторизация](.github/workflows/docker-image.yml#L15) происходит по токену с помощью `docker/login-action@v2`.
+[Авторизация](.github/workflows/docker-image.yml#L15) происходит по токену с
+помощью `docker/login-action@v2`.
 
 ### Этап 3. Копирование для сборки образа
 
-[На данном этапе](.github/workflows/docker-image.yml#L21) создается окружение для сборки образа.
+[На данном этапе](.github/workflows/docker-image.yml#L21) создается окружение
+для сборки образа.
 
-### Этап 4. Сборка и отправка образа 
+### Этап 4. Сборка и отправка образа
 
-Образ [собирается внутри экшена и отправляется](.github/workflows/docker-image.yml#L24) на DockerHub.
+Образ [собирается внутри экшена и отправляется](.github/workflows/docker-image.yml#L24)
+на DockerHub.
 
 ## CD
 
@@ -55,18 +61,46 @@
 
 ### Этап 1. Копирование кода
 
-[Исходный код копируется](.github/workflows/cd.yml#L13) в экшен посредством `actions/checkout@v3`.
+[Исходный код копируется](.github/workflows/cd.yml#L13) в экшен
+посредством `actions/checkout@v3`.
 
-### Этап 2. Подключение к WireGuard 
+### Этап 2. Подключение к WireGuard
 
-[На данном этапе](.github/workflows/cd.yml#L16) происходит установка клиента WireGuard и его настройка на работу с сервером.
+[На данном этапе](.github/workflows/cd.yml#L16) происходит установка клиента
+WireGuard и его настройка на работу с сервером.
 
 ### Этап 3. Отправка данных на север
 
-Из экшена [формируется запрос](.github/workflows/cd.yml#L33) на специальную ручку на сервере, запрос выполняется внутри виртуальной сети WireGuard. Тело данного запроса состоит из формы, в которой передаются:
+Из экшена [формируется запрос](.github/workflows/cd.yml#L33) на специальную
+ручку на сервере, запрос выполняется внутри виртуальной сети WireGuard. Тело
+данного запроса состоит из формы, в которой передаются:
 
 - Токен — необходим для подтверждения запроса
 - `entry.sh` — Файл, который будет запускать процесс развертывания
 - `myFiles` — остальные файлы, которые необходимы для развертывания
 
+## API калькулятора
 
+Калькулятор слушает `8000` порт.
+
+### Swagger
+
+Swagger находится на ручке [/docs]()
+
+### expression
+
+Ручка [/expression]() проводит вычисления для двух чисел. Используется `GET`
+запрос с параметрами:
+
+| Параметр    |                    Тип                    |
+|:------------|:-----------------------------------------:|
+| `number1`   |                    int                    |
+| `number2`   |                    int                    |
+| `operation` | <code>+ &#124; - &#124; * &#124; /</code> |
+
+#### Пример
+
+```shell
+curl --location --request GET \
+  'http://localhost:8000/expression?number1=2&number2=3&operation=%252B
+```
