@@ -1,0 +1,10 @@
+version: '2'
+services:
+  app:
+    image: '<tag>'
+    restart: always
+    ports:
+      - "80:80"
+    container_name: calc
+    environment:
+      - PORT=80
