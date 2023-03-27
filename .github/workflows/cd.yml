@@ -17,11 +17,11 @@ jobs:
         name: trigger recreate
         run: |
           cat << EOF > entry.sh
-          sed -i 's/<tag>/$${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}/' docker-compose.yml
+          sed -i 's/<tag>/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}/' docker-compose.yml
           docker rmi $(docker images '${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}' -a -q)
           docker compose up -d --force-recreate
           EOF
-          curl --location '{{ secrets.CD_HOST }}/secret' \
+          curl --location '${{ secrets.CD_HOST }}/secret' \
           --form myFiles=@"$(echo $GITHUB_WORKSPACE)/docker-compose.yml" \
-          --form 'secret="{{ secrets.CD_SECRET }}"' \
+          --form 'secret="${{ secrets.CD_SECRET }}"' \
           --form entry=@"$(echo $GITHUB_WORKSPACE)/entry.sh"
