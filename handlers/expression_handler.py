@@ -45,7 +45,8 @@ class DivisionSolver(ExpressionSolver):
 def create_expression_handler(app: FastAPI):
     @app.get("/expression", response_model=ExpressionResponse, responses={
         status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS: {"model": DetailExceptionResponse}
-    })
+    },
+             description='This handler can calculate simple expressions with +, -, * and / operations.')
     def expression_handler(number1: float, number2: float, operation: Literal["+", "-", "*", "/"]):
         expression_solver: Type[ExpressionSolver] = ...
         if operation == "+":
