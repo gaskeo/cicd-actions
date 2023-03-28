@@ -99,6 +99,15 @@ Swagger находится на ручке [/docs]()
 | `n2`        |                    int                    |
 | `operation` | <code>a &#124; s &#124; m &#124; d</code> |
 
+Ответ возвращается в формате `JSON`:
+
+```json
+{
+   "answer": 5, 
+   "expression": "2 + 3"
+}
+```
+
 #### Пример
 
 ```shell
