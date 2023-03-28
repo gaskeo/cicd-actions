@@ -9,7 +9,8 @@
 2. [Отправка собранного контейнера](.github/workflows/docker-image.yml)
    в [DockerHub](https://hub.docker.com)
 3. Логин [в WireGuard](.github/workflows/docker-image.yml)
-4. [Отправка запроса](https://github.com/gaskeo/cd-handler) на развертывание нового
+4. [Отправка запроса](https://github.com/gaskeo/cd-handler) на развертывание
+   нового
    образа [на специальную ручку на сервере](.github/workflows/cd.yml#L34) по
    виртуальной сети
 5. Развертывание нового образа на сервере
@@ -94,13 +95,13 @@ Swagger находится на ручке [/docs]()
 
 | Параметр    |                    Тип                    |
 |:------------|:-----------------------------------------:|
-| `number1`   |                    int                    |
-| `number2`   |                    int                    |
-| `operation` | <code>+ &#124; - &#124; * &#124; /</code> |
+| `n1`        |                    int                    |
+| `n2`        |                    int                    |
+| `operation` | <code>a &#124; s &#124; m &#124; d</code> |
 
 #### Пример
 
 ```shell
 curl --location --request GET \
-  'http://localhost:8000/expression?number1=2&number2=3&operation=%252B
+  'http://localhost:8000/expression?n1=2&n2=3&operation=a
 ```
