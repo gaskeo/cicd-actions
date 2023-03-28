@@ -46,19 +46,20 @@ def create_expression_handler(app: FastAPI):
     @app.get("/expression", response_model=ExpressionResponse, responses={
         status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS: {"model": DetailExceptionResponse}
     },
-             description='This handler can calculate simple expressions with +, -, * and / operations.')
-    def expression_handler(number1: float, number2: float, operation: Literal["+", "-", "*", "/"]):
+             description='This handler can calculate simple expressions '
+                         'with  **[a]ddition**, **[s]ubtraction**, **[m]ultiplication** and **[d]ivision** operations.')
+    def expression_handler(n1: float, n2: float, operation: Literal["a", "s", "m", "d"]):
         expression_solver: Type[ExpressionSolver] = ...
-        if operation == "+":
+        if operation == "a":
             expression_solver = SumSolver
-        if operation == "-":
+        if operation == "s":
             expression_solver = DifferenceSolver
-        if operation == "*":
+        if operation == "m":
             expression_solver = MultiplicationSolver
-        if operation == "/":
+        if operation == "d":
             expression_solver = DivisionSolver
         try:
-            return {"answer": expression_solver(number1, number2).solve()}
+            return {"answer": expression_solver(n1, n2).solve()}
         except ZeroDivisionError:
             return JSONResponse(status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
                                 content={"detail": "Division by zero"})
