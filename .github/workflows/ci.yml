@@ -11,10 +11,11 @@ jobs:
     steps:
       - name: repo checkout
         uses: actions/checkout@v3
-      - name: bandit prepare and run
+      - name: python prepare
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+      - name: bandit prepare and run
         run: |
           cd $GITHUB_WORKSPACE
           echo python -V
