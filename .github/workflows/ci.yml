@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "main"
+      
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v3
+      - name: bandit prepare and run
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+        run: |
+          cd $GITHUB_WORKSPACE
+          echo python -V
+          pip install -r requirements/dev.requirements.txt
+          bandit -r . -f txt -o bandit_report.txt
+          cat << EOF > bandit-report-check.sh
+          #!/bin/bash
+          grep_out=$(cat bandit_report.txt | grep "[Ss]everity..[Hh]igh")
+          if [ "$grep_out" = "" ];
+              then
+                  echo "Ok"
+                  exit 0
+          fi
+          echo "Project has high-level issues. Checkout artifacts"
+          exit 1
+          EOF
+          chmod 777 bandit-report-check.sh
+      - name: bandit output save
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: $GITHUB_WORKSPACE/bandit_report.txt
+      - name: bandit output checkout
+        run: |
+          cd $GITHUB_WORKSPACE
+          ./bandit-report-check.sh
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
