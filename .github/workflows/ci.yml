@@ -21,7 +21,7 @@ jobs:
           echo python -V
           pip install -r requirements/dev.requirements.txt
           bandit -r . -f txt -o bandit_report.txt --exit-zero
-          cat << EOF > bandit-report-check.sh
+          echo -e ' 
           #!/bin/bash
           grep_out=$(cat bandit_report.txt | grep "[Ss]everity..[Hh]igh")
           if [ "$grep_out" = "" ];
@@ -30,8 +30,7 @@ jobs:
                   exit 0
           fi
           echo "Project has high-level issues. Checkout artifacts"
-          exit 1
-          EOF
+          exit 1' > bandit-report-check.sh
           chmod 777 bandit-report-check.sh
       - name: bandit output save
         uses: actions/upload-artifact@v3
