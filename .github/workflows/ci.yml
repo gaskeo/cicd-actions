@@ -20,7 +20,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           echo python -V
           pip install -r requirements/dev.requirements.txt
-          bandit -r . -f txt -o bandit_report.txt
+          bandit -r . -f txt -o bandit_report.txt --exit-zero
           cat << EOF > bandit-report-check.sh
           #!/bin/bash
           grep_out=$(cat bandit_report.txt | grep "[Ss]everity..[Hh]igh")
