@@ -44,6 +44,7 @@ jobs:
           ./bandit-report-check.sh
 
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: repo checkout
