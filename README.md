@@ -5,15 +5,12 @@
 
 ## Этапы CI/CD
 
-1. [Сборка](.github/workflows/docker-image.yml) контейнера
-2. [Отправка собранного контейнера](.github/workflows/docker-image.yml)
-   в [DockerHub](https://hub.docker.com)
-3. Логин [в WireGuard](.github/workflows/docker-image.yml)
-4. [Отправка запроса](https://github.com/gaskeo/cd-handler) на развертывание
-   нового
-   образа [на специальную ручку на сервере](.github/workflows/cd.yml#L34) по
-   виртуальной сети
-5. Развертывание нового образа на сервере
+1. [Проверка](.github/workflows/ci.yml#L11) исходного кода с помощью [SAST Bandit](https://bandit.readthedocs.io/en/latest/)
+2. [Сборка](.github/workflows/ci.yml#L58) контейнера
+3. [Отправка собранного контейнера](.github/workflows/ci.yml#L58) в [DockerHub](https://hub.docker.com)
+4. Логин [в WireGuard](.github/workflows/cd.yml#L17)
+5. [Отправка запроса](https://github.com/gaskeo/cd-handler) на развертывание нового образа [на специальную ручку на сервере](.github/workflows/cd.yml#L34) по виртуальной сети
+6. [Развертывание](.github/workflows/cd.yml#L35) нового образа на сервере
 
 ## Секретные переменные
 
@@ -32,33 +29,47 @@
 
 ## CI
 
-Весь CI запускается в
-одном [github action](https://github.com/gaskeo/cicd-actions/blob/main/.github/workflows/docker-image.yml),
-он состоит из 4 этапов.
+Весь CI запускается в одном [github action](.github/workflows/ci.yml), он состоит из двух работ и 9 этапов.
 
-### Этап 1. Копирование кода
+### Работа 1. Этап 1. Копирование кода
 
-[Исходный код копируется](.github/workflows/docker-image.yml#L12) в экшен
-посредством `actions/checkout@v3`.
+[Исходный код копируется](.github/workflows/ci.yml#L12) в экшен посредством `actions/checkout@v3`.
 
-### Этап 2. Вход в DockerHub
+### Работа 1. Этап 2. Подготовка python
 
-[Авторизация](.github/workflows/docker-image.yml#L15) происходит по токену с
-помощью `docker/login-action@v2`.
+[Устанавливается](.github/workflows/ci.yml#L14) [Python](https://www.python.org/) 3.9.
 
-### Этап 3. Копирование для сборки образа
+### Работа 1. Этап 3. Bandit
 
-[На данном этапе](.github/workflows/docker-image.yml#L21) создается окружение
-для сборки образа.
+[Устанавливаются](.github/workflows/ci.yml#L18) зависимости, [Bandit](https://bandit.readthedocs.io/en/latest/) готовит отчет.
 
-### Этап 4. Сборка и отправка образа
+### Работа 1. Этап 4. Артефакты 
 
-Образ [собирается внутри экшена и отправляется](.github/workflows/docker-image.yml#L24)
-на DockerHub.
+Результат работы [Bandit](https://bandit.readthedocs.io/en/latest/) [сохраняется](.github/workflows/ci.yml#L35) в артефакты экшена.
+
+### Работа 1. Этап 5. Проверка
+
+Результат работы Bandit проверяется на наличие high-level уязвимостей. 
+
+### Работа 2. Этап 1. Копирование кода
+
+[Исходный код копируется](.github/workflows/docker-image.yml#L12) в экшен посредством `actions/checkout@v3`.
+
+### Работа 2. Этап 2. Вход в DockerHub
+
+[Авторизация](.github/workflows/docker-image.yml#L15) происходит по токену с помощью `docker/login-action@v2`.
+
+### Работа 2. Этап 3. Копирование для сборки образа
+
+[На данном этапе](.github/workflows/docker-image.yml#L21) создается окружение для сборки образа.
+
+### Работа 2. Этап 4. Сборка и отправка образа
+
+Образ [собирается внутри экшена и отправляется](.github/workflows/docker-image.yml#L24) в DockerHub.
 
 ## CD
 
-Процесс CD также запускается с помощью одного экшена в 3 этапа.
+Процесс CD запускается с помощью одного экшена в 3 этапа.
 
 ### Этап 1. Копирование кода
 
@@ -103,8 +114,8 @@ Swagger находится на ручке [/docs]()
 
 ```json
 {
-   "answer": 5, 
-   "expression": "2 + 3"
+  "answer": 5,
+  "expression": "2 + 3"
 }
 ```
 
