@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bandit-report
-          path: $GITHUB_WORKSPACE/bandit_report.txt
+          path: bandit_report.txt
       - name: bandit output checkout
         run: |
           cd $GITHUB_WORKSPACE
